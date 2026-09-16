@@ -27,6 +27,9 @@ internal static partial class Log
     [LoggerMessage(Level = LogLevel.Information, Message = "Action end. action=[{action}]")]
     public static partial void InfoActionEnd(this ILogger logger, string action);
 
+    [LoggerMessage(Level = LogLevel.Information, Message = "Action canceled. action=[{action}]")]
+    public static partial void InfoActionCanceled(this ILogger logger, string action);
+
     [LoggerMessage(Level = LogLevel.Warning, Message = "Unknown action. action=[{action}]")]
     public static partial void WarnActionUnknown(this ILogger logger, string action);
 

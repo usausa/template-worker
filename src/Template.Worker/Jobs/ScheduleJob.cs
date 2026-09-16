@@ -39,6 +39,10 @@ public sealed class ScheduleJob : ISchedulerJob
             await action.ExecuteAsync([.. setting.Schedule.Arguments], cancellationToken);
             log.InfoActionEnd(action.Name);
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            log.InfoActionCanceled(action.Name);
+        }
         catch (Exception ex)
         {
             log.ErrorActionFailed(ex, action.Name);

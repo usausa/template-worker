@@ -41,6 +41,10 @@ public sealed class ActionWorker : BackgroundService
             await action.ExecuteAsync(arguments.GetParameters(), stoppingToken);
             log.InfoActionEnd(action.Name);
         }
+        catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
+        {
+            log.InfoActionCanceled(arguments.Name);
+        }
         catch (Exception ex)
         {
             log.ErrorActionFailed(ex, arguments.Name);
