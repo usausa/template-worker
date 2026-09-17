@@ -46,6 +46,12 @@ internal static partial class Log
     [LoggerMessage(Level = LogLevel.Warning, Message = "Cleanup directory not found. directory=[{directory}]")]
     public static partial void WarnCleanupDirectoryNotFound(this ILogger logger, string directory);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup completed. directory=[{directory}], deleted=[{deleted}]")]
-    public static partial void InfoCleanupCompleted(this ILogger logger, string directory, int deleted);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Cleanup delete failed. file=[{file}]")]
+    public static partial void WarnCleanupDeleteFailed(this ILogger logger, Exception ex, string file);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup budget exceeded. directory=[{directory}], processed=[{processed}]")]
+    public static partial void InfoCleanupBudgetExceeded(this ILogger logger, string directory, int processed);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup completed. directory=[{directory}], deleted=[{deleted}], failed=[{failed}]")]
+    public static partial void InfoCleanupCompleted(this ILogger logger, string directory, int deleted, int failed);
 }

@@ -29,19 +29,36 @@ public sealed class CleanupAction : IAction
         }
 
         var threshold = timeProvider.GetLocalNow().DateTime.AddDays(-setting.Cleanup.RetainDays);
-        var count = 0;
+        var budget = TimeSpan.FromSeconds(setting.Cleanup.MaxSeconds);
+        var start = timeProvider.GetTimestamp();
+        var deleted = 0;
+        var failed = 0;
         foreach (var file in Directory.EnumerateFiles(directory))
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            if ((deleted + failed >= setting.Cleanup.MaxFiles) || (timeProvider.GetElapsedTime(start) >= budget))
+            {
+                log.InfoCleanupBudgetExceeded(directory, deleted + failed);
+                break;
+            }
+
             if (File.GetLastWriteTime(file) < threshold)
             {
-                File.Delete(file);
-                count++;
+                try
+                {
+                    File.Delete(file);
+                    deleted++;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    log.WarnCleanupDeleteFailed(ex, file);
+                    failed++;
+                }
             }
         }
 
-        log.InfoCleanupCompleted(directory, count);
+        log.InfoCleanupCompleted(directory, deleted, failed);
         return ValueTask.CompletedTask;
     }
 }

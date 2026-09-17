@@ -26,5 +26,11 @@ public sealed class WorkerSetting
 
         [Range(0, 3650)]
         public int RetainDays { get; set; }
+
+        [Range(1, Int32.MaxValue)]
+        public int MaxFiles { get; set; }
+
+        [Range(1, 86400)]
+        public int MaxSeconds { get; set; }
     }
 }
