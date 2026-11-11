@@ -1,6 +1,6 @@
 # Template project for Worker Service
 
-Worker Service template (.NET 10).
+[Template](https://usausa.github.io/template/) project for Worker Service.
 
 # ✅ Implement
 
