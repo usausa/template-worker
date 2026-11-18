@@ -14,9 +14,9 @@ public sealed class HelloAction : IAction
         this.timeProvider = timeProvider;
     }
 
-    public ValueTask ExecuteAsync(string[] args, CancellationToken cancellationToken)
+    public ValueTask<ActionResult> ExecuteAsync(string[] args, CancellationToken cancellationToken)
     {
         log.InfoHello(timeProvider.GetLocalNow(), String.Join(' ', args));
-        return ValueTask.CompletedTask;
+        return ValueTask.FromResult(ActionResult.None);
     }
 }

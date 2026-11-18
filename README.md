@@ -6,10 +6,19 @@
 
 | Category | Feature |
 | --- | --- |
-| Job | Schedule mode (cron, Mofucat.JobScheduler) / Batch mode (command line, exit code) / Named actions / Graceful stop |
-| Action | Hello / Cleanup (retention days, file and time budget) |
+| Job | Schedule mode (named cron schedules in local time, misfire policy, Mofucat.JobScheduler) / Batch mode (command line, exit code) / Named actions / Graceful stop |
+| Action | Hello / Cleanup (retention policies by age, extension, size and depth, file and time budget) |
+| Result | Summary log (succeeded, skipped, failed, freed, elapsed) / Comparison with the previous run |
 | Basic | Setting (validated on start) / Logging (Serilog) / Startup log |
 | Operation | Windows service / systemd |
+
+# 📚 Docs
+
+The documents in `docs` are in Japanese.
+
+| Document | Contents |
+| --- | --- |
+| [settings.md](docs/settings.md) | Schedules, retention policies, results, exit codes, and validation |
 
 # 🔗 Related Projects
 

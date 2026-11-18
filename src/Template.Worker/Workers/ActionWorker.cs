@@ -38,7 +38,20 @@ public sealed class ActionWorker : BackgroundService
             }
 
             log.InfoActionStart(action.Name);
-            await action.ExecuteAsync(arguments.GetParameters(), stoppingToken);
+            var result = await action.ExecuteAsync(arguments.GetParameters(), stoppingToken);
+            if (result == ActionResult.Invalid)
+            {
+                Environment.ExitCode = -1;
+            }
+            else if (result != ActionResult.None)
+            {
+                log.InfoActionSummary(action.Name, result.Succeeded, result.Skipped, result.Failed, result.FreedBytes, result.Elapsed, result.Truncated);
+                if (result.Failed > 0)
+                {
+                    Environment.ExitCode = 1;
+                }
+            }
+
             log.InfoActionEnd(action.Name);
         }
         catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)

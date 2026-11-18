@@ -30,10 +30,11 @@ builder.Services.AddSerilog(options =>
 builder.Services.AddSingleton(TimeProvider.System);
 
 // Setting
-builder.Services.AddOptions<WorkerSetting>().BindConfiguration("Worker").ValidateDataAnnotations().ValidateOnStart();
+builder.Services.AddOptions<WorkerSetting>().BindConfiguration("Worker", static options => options.ErrorOnUnknownConfiguration = true).ValidateDataAnnotations().ValidateOnStart();
 builder.Services.AddSingleton(static p => p.GetRequiredService<IOptions<WorkerSetting>>().Value);
 
 // Action
+builder.Services.AddSingleton<ActionHistory>();
 builder.Services.AddSingleton<IAction, HelloAction>();
 builder.Services.AddSingleton<IAction, CleanupAction>();
 
@@ -46,10 +47,13 @@ if (args.Length > 0)
 else
 {
     // Schedule mode
-    var setting = builder.Configuration.GetSection("Worker").Get<WorkerSetting>()!;
+    var setting = builder.Configuration.GetSection("Worker").Get<WorkerSetting>(static options => options.ErrorOnUnknownConfiguration = true)!;
     builder.Services.AddJobSchedulerService(options =>
     {
-        options.UseJob<ScheduleJob>(setting.Schedule.Cron);
+        foreach (var schedule in setting.Schedules)
+        {
+            options.UseJob(schedule.Cron, p => ActivatorUtilities.CreateInstance<ScheduleJob>(p, schedule), schedule.Name, schedule.Misfire, schedule.MaxCatchUp);
+        }
     });
 }
 

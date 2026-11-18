@@ -24,6 +24,9 @@ internal static partial class Log
     [LoggerMessage(Level = LogLevel.Information, Message = "Action start. action=[{action}]")]
     public static partial void InfoActionStart(this ILogger logger, string action);
 
+    [LoggerMessage(Level = LogLevel.Information, Message = "Action summary. action=[{action}], succeeded=[{succeeded}], skipped=[{skipped}], failed=[{failed}], freed=[{freed}], elapsed=[{elapsed}], truncated=[{truncated}]")]
+    public static partial void InfoActionSummary(this ILogger logger, string action, int succeeded, int skipped, int failed, long freed, TimeSpan elapsed, bool truncated);
+
     [LoggerMessage(Level = LogLevel.Information, Message = "Action end. action=[{action}]")]
     public static partial void InfoActionEnd(this ILogger logger, string action);
 
@@ -43,15 +46,29 @@ internal static partial class Log
 
     // Cleanup
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Cleanup directory not found. directory=[{directory}]")]
-    public static partial void WarnCleanupDirectoryNotFound(this ILogger logger, string directory);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Cleanup policy unknown. policy=[{policy}]")]
+    public static partial void WarnCleanupPolicyUnknown(this ILogger logger, string policy);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Cleanup directory not found. policy=[{policy}], directory=[{directory}]")]
+    public static partial void WarnCleanupDirectoryNotFound(this ILogger logger, string policy, string directory);
 
     [LoggerMessage(Level = LogLevel.Warning, Message = "Cleanup delete failed. file=[{file}]")]
     public static partial void WarnCleanupDeleteFailed(this ILogger logger, Exception ex, string file);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup budget exceeded. directory=[{directory}], processed=[{processed}]")]
-    public static partial void InfoCleanupBudgetExceeded(this ILogger logger, string directory, int processed);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup budget exceeded. policy=[{policy}], processed=[{processed}]")]
+    public static partial void InfoCleanupBudgetExceeded(this ILogger logger, string policy, int processed);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup completed. directory=[{directory}], deleted=[{deleted}], failed=[{failed}]")]
-    public static partial void InfoCleanupCompleted(this ILogger logger, string directory, int deleted, int failed);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup summary. policy=[{policy}], succeeded=[{succeeded}], skipped=[{skipped}], failed=[{failed}], freed=[{freed}], elapsed=[{elapsed}], truncated=[{truncated}]")]
+    public static partial void InfoCleanupSummary(this ILogger logger, string policy, int succeeded, int skipped, int failed, long freed, TimeSpan elapsed, bool truncated);
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Cleanup compared. policy=[{policy}], previous=[{previous}], succeeded=[{succeeded:+0;-0;0}], skipped=[{skipped:+0;-0;0}], failed=[{failed:+0;-0;0}], freed=[{freed:+0;-0;0}], elapsed=[{elapsed}]")]
+    public static partial void InfoCleanupCompared(this ILogger logger, string policy, DateTimeOffset previous, int succeeded, int skipped, int failed, long freed, TimeSpan elapsed);
+
+    // History
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "History read failed. file=[{file}]")]
+    public static partial void WarnHistoryReadFailed(this ILogger logger, Exception ex, string file);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "History write failed. file=[{file}]")]
+    public static partial void WarnHistoryWriteFailed(this ILogger logger, Exception ex, string file);
 }

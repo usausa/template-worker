@@ -9,26 +9,26 @@ public sealed class ScheduleJob : ISchedulerJob
 {
     private readonly ILogger<ScheduleJob> log;
 
-    private readonly WorkerSetting setting;
-
     private readonly IEnumerable<IAction> actions;
+
+    private readonly WorkerSetting.ScheduleEntry schedule;
 
     public ScheduleJob(
         ILogger<ScheduleJob> log,
-        WorkerSetting setting,
-        IEnumerable<IAction> actions)
+        IEnumerable<IAction> actions,
+        WorkerSetting.ScheduleEntry schedule)
     {
         this.log = log;
-        this.setting = setting;
         this.actions = actions;
+        this.schedule = schedule;
     }
 
     public async ValueTask ExecuteAsync(DateTimeOffset time, CancellationToken cancellationToken)
     {
-        var action = actions.FirstOrDefault(x => String.Equals(x.Name, setting.Schedule.Action, StringComparison.OrdinalIgnoreCase));
+        var action = actions.FirstOrDefault(x => String.Equals(x.Name, schedule.Action, StringComparison.OrdinalIgnoreCase));
         if (action is null)
         {
-            log.WarnActionUnknown(setting.Schedule.Action);
+            log.WarnActionUnknown(schedule.Action);
             return;
         }
 
@@ -36,7 +36,12 @@ public sealed class ScheduleJob : ISchedulerJob
         try
         {
             log.InfoActionStart(action.Name);
-            await action.ExecuteAsync([.. setting.Schedule.Arguments], cancellationToken);
+            var result = await action.ExecuteAsync([.. schedule.Arguments], cancellationToken);
+            if ((result != ActionResult.None) && (result != ActionResult.Invalid))
+            {
+                log.InfoActionSummary(action.Name, result.Succeeded, result.Skipped, result.Failed, result.FreedBytes, result.Elapsed, result.Truncated);
+            }
+
             log.InfoActionEnd(action.Name);
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
